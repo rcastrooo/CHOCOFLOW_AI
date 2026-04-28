@@ -1,0 +1,81 @@
+
+    body {
+        background-color: #fff;
+    }
+
+    /* NAVBAR */
+    .navbar {
+        background-color: #8e44ad;
+    }
+
+    .navbar-brand, .nav-link {
+        color: white !important;
+        font-weight: 500;
+    }
+
+    /* HERO con imagen + overlay */
+    .hero {
+        position: relative;
+        background: url('https://thumbs.dreamstime.com/b/empleados-de-la-f%C3%A1brica-del-chocolate-19138742.jpg') center/cover no-repeat;
+        height: 90vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        color: white;
+    }
+
+    /* Overlay oscuro */
+    .hero::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.55);
+    }
+
+    /* Contenido encima del overlay */
+    .hero-content {
+        position: relative;
+        z-index: 2;
+        max-width: 800px;
+    }
+
+    /* CARDS */
+    .card-custom {
+        border: none;
+        border-radius: 20px;
+        transition: 0.3s;
+    }
+
+    .card-custom:hover {
+        transform: scale(1.05);
+    }
+
+    /* BOTÓN */
+    .btn-custom {
+        background: transparent;
+        color: white;
+        border: 2px solid white;
+        border-radius: 25px;
+        padding: 10px 25px;
+        transition: 0.3s;
+    }
+
+    .btn-custom:hover {
+        background: white;
+        color: #8e44ad;
+    }
+
+    /* TÍTULOS */
+    .section-title {
+        color: #8e44ad;
+        font-weight: bold;
+    }
+
+    /* FOOTER */
+    footer {
+        background-color: #8e44ad;
+        color: white;
+        padding: 20px;
+        text-align: center;
+    }
