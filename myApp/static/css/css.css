@@ -1,0 +1,47 @@
+ body {
+            background-color: #fff;
+        }
+
+        .navbar {
+            background-color: #8e44ad;
+        }
+
+        .navbar-brand, .nav-link {
+            color: white !important;
+            font-weight: 500;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #8e44ad, #ff6b81);
+            color: white;
+            padding: 80px 20px;
+            text-align: center;
+        }
+
+        .card-custom {
+            border: none;
+            border-radius: 20px;
+            transition: 0.3s;
+        }
+
+        .card-custom:hover {
+            transform: scale(1.05);
+        }
+
+        .btn-custom {
+            background-color: #ff7f50;
+            color: white;
+            border-radius: 25px;
+        }
+
+        .section-title {
+            color: #8e44ad;
+            font-weight: bold;
+        }
+
+        footer {
+            background-color: #8e44ad;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
