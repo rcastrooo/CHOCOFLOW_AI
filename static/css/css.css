@@ -1,7 +1,6 @@
- body {
+        body:not(.login-page) {
             background-color: #fff;
         }
-
         .navbar {
             background-color: #8e44ad;
         }

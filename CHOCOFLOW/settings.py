@@ -1,17 +1,17 @@
 from pathlib import Path
 import os
 
-# 📁 Ruta base del proyecto
+# Ruta base del proyecto
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# 🔐 Seguridad
+# Seguridad
 SECRET_KEY = 'django-insecure-cambia-esto-por-uno-seguro'
 
 DEBUG = True
 
 ALLOWED_HOSTS = []
 
-# 📦 Apps instaladas
+# Apps instaladas
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -19,12 +19,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
-    # Tu app 
     'myApp',
 ]
 
-# 🔗 Middleware
+# Middleware
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -35,14 +33,14 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-# 🌐 URLs
+# URLs
 ROOT_URLCONF = 'CHOCOFLOW.urls'
 
-# 🖥️ Templates
+# Templates
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],  # opcional
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -55,16 +53,16 @@ TEMPLATES = [
     },
 ]
 
-# 🚀 WSGI
+# WSGI
 WSGI_APPLICATION = 'CHOCOFLOW.wsgi.application'
 
-# 🐬 Base de datos MySQL
+# Base de datos MySQL
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'chocoflow',
         'USER': 'root',
-        'PASSWORD': '',
+        'PASSWORD': 'Ariadna_2024',
         'HOST': 'localhost',
         'PORT': '3306',
         'OPTIONS': {
@@ -74,7 +72,7 @@ DATABASES = {
     }
 }
 
-# 🔑 Validación de contraseñas
+# Validación de contraseñas
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -90,25 +88,22 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# 🌎 Idioma y zona horaria
+# Idioma y zona horaria
 LANGUAGE_CODE = 'es-co'
-
 TIME_ZONE = 'America/Bogota'
-
 USE_I18N = True
 USE_TZ = True
 
-# 📁 Archivos estáticos
-STATIC_URL = 'static/'
+# Archivos estáticos — corregido
+STATIC_URL = '/static/'
 
-# 📁 Archivos estáticos adicionales (opcional)
 STATICFILES_DIRS = [
-    BASE_DIR / 'static'
+    BASE_DIR / 'static',
 ]
 
-# 📁 Archivos multimedia (opcional)
+# Archivos multimedia
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-# 🔑 Tipo de clave primaria
+# Tipo de clave primaria
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

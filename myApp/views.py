@@ -1,6 +1,143 @@
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
+from django.shortcuts import render, redirect
+from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login
+from django.contrib import messages
+
+def registro(request):
+
+    if request.method == 'POST':
+
+        identificacion = request.POST['identificacion'].strip()
+        nombre = request.POST['nombre'].strip()
+        correo = request.POST['correo'].strip()
+        password = request.POST['password'].strip()
+        rol = request.POST['rol']
+        estado = request.POST['estado']
+
+        # ========================
+        # VALIDACIONES DE CAMPOS
+        # ========================
+
+        # Identificación: solo números, mínimo 5 dígitos
+        if not identificacion.isdigit():
+            messages.error(request, "La identificación solo debe contener números.")
+            return redirect('registro')
+
+        if len(identificacion) < 5:
+            messages.error(request, "La identificación debe tener al menos 5 dígitos.")
+            return redirect('registro')
+
+        # Nombre: solo letras y espacios, mínimo 3 caracteres
+        if not all(c.isalpha() or c.isspace() for c in nombre):
+            messages.error(request, "El nombre solo debe contener letras.")
+            return redirect('registro')
+
+        if len(nombre) < 3:
+            messages.error(request, "El nombre debe tener al menos 3 caracteres.")
+            return redirect('registro')
+
+        # Correo: formato válido
+        import re
+        patron_correo = r'^[\w\.-]+@[\w\.-]+\.\w{2,}$'
+        if not re.match(patron_correo, correo):
+            messages.error(request, "El correo no tiene un formato válido.")
+            return redirect('registro')
+
+        # Contraseña: mínimo 8 caracteres, una mayúscula y un número
+        if len(password) < 8:
+            messages.error(request, "La contraseña debe tener al menos 8 caracteres.")
+            return redirect('registro')
+
+        if not any(c.isupper() for c in password):
+            messages.error(request, "La contraseña debe tener al menos una mayúscula.")
+            return redirect('registro')
+
+        if not any(c.isdigit() for c in password):
+            messages.error(request, "La contraseña debe tener al menos un número.")
+            return redirect('registro')
+
+        # Rol y estado: no pueden estar vacíos
+        if not rol:
+            messages.error(request, "Debes seleccionar un rol.")
+            return redirect('registro')
+
+        if not estado:
+            messages.error(request, "Debes seleccionar un estado.")
+            return redirect('registro')
+
+        # ========================
+        # VALIDACIONES DE BD
+        # ========================
+
+        if User.objects.filter(username=identificacion).exists():
+            messages.error(request, "Esa identificación ya está registrada.")
+            return redirect('registro')
+
+        if User.objects.filter(email=correo).exists():
+            messages.error(request, "Ese correo ya está registrado.")
+            return redirect('registro')
+
+        # ========================
+        # CREAR USUARIO
+        # ========================
+        User.objects.create_user(
+            username=identificacion,
+            first_name=nombre,
+            email=correo,
+            password=password
+        )
+
+        messages.success(request, "Usuario registrado correctamente ")
+        return redirect('login')
+
+    return render(request, 'auth/registro.html')
+
+
+def login_usuario(request):
+    if request.method == 'POST':
+        correo = request.POST['username'].strip()
+        password = request.POST['password'].strip()
+
+        # ========================
+        # VALIDACIONES
+        # ========================
+
+        # Campos vacíos
+        if not correo or not password:
+            messages.error(request, "Todos los campos son obligatorios.")
+            return render(request, 'auth/login.html')
+
+        # Formato correo
+        import re
+        patron_correo = r'^[\w\.-]+@[\w\.-]+\.\w{2,}$'
+        if not re.match(patron_correo, correo):
+            messages.error(request, "El correo no tiene un formato válido.")
+            return render(request, 'auth/login.html')
+
+        # ========================
+        # AUTENTICACIÓN
+        # ========================
+        from django.contrib.auth.models import User
+        try:
+            user_obj = User.objects.get(email=correo)
+            user = authenticate(
+                request,
+                username=user_obj.username,
+                password=password
+            )
+        except User.DoesNotExist:
+            user = None
+
+        if user:
+            login(request, user)
+            return redirect('index')
+        else:
+            messages.error(request, "Correo o contraseña incorrectos ")
+
+    return render(request, 'auth/login.html')
 
 # Importación de modelos actualizados
 from .models import (
