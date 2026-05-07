@@ -58,19 +58,11 @@ TEMPLATES = [
 # 🚀 WSGI
 WSGI_APPLICATION = 'CHOCOFLOW.wsgi.application'
 
-# 🐬 Base de datos MySQL
+# 🗄️ Base de datos SQLite
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'chocoflow',
-        'USER': 'root',
-        'PASSWORD': '',
-        'HOST': 'localhost',
-        'PORT': '3306',
-        'OPTIONS': {
-            'charset': 'utf8mb4',
-            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
-        }
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
@@ -112,3 +104,5 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 # 🔑 Tipo de clave primaria
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+# API Key de Anthropic para el módulo de IA
+ANTHROPIC_API_KEY = 'tu-api-key-aqui'

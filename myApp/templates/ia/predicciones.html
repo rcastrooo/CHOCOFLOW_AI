@@ -1,0 +1,159 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>ChocoFlow - IA Predicciones</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/panel.css' %}">
+</head>
+<body>
+<div class="d-flex">
+    <div class="sidebar">
+        <h4>🍫 ChocoFlow</h4>
+        <a href="{% url 'dashboard' %}">📊 Dashboard</a>
+        <a href="{% url 'usuarios_lista' %}">👥 Usuarios</a>
+        <a href="{% url 'turnos_lista' %}">🕐 Turnos</a>
+        <a href="{% url 'producciones_lista' %}">📦 Producción</a>
+        <a href="{% url 'exportaciones_lista' %}">🚚 Exportaciones</a>
+        <a href="{% url 'asignaciones_lista' %}">📋 Asignaciones</a>
+        <a href="{% url 'reportes_lista' %}">📊 Reportes</a>
+        <a href="{% url 'ia_predicciones' %}" class="active">🤖 IA</a>
+        <hr style="border-color: rgba(255,255,255,0.3);">
+        <a href="{% url 'logout' %}">🚪 Cerrar Sesión</a>
+    </div>
+
+    <div class="flex-grow-1">
+        <div class="topbar">
+            <h5 class="mb-0">🤖 Inteligencia Artificial — Predicciones</h5>
+            <span class="text-muted small">Análisis basado en datos reales del sistema</span>
+        </div>
+
+        <div class="p-4">
+
+            <!-- ESTADÍSTICAS RÁPIDAS -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <div class="card text-white h-100" style="background: linear-gradient(135deg,#e67e22,#d35400); border-radius:12px;">
+                        <div class="card-body">
+                            <p class="mb-1">📦 Producciones registradas</p>
+                            <h2 class="fw-bold">{{ total_producciones }}</h2>
+                            <span class="stat-pill">disponibles para análisis</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card text-white h-100" style="background: linear-gradient(135deg,#2e86c1,#1a5276); border-radius:12px;">
+                        <div class="card-body">
+                            <p class="mb-1">🚚 Exportaciones registradas</p>
+                            <h2 class="fw-bold">{{ total_exportaciones }}</h2>
+                            <span class="stat-pill">disponibles para análisis</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card text-white h-100" style="background: linear-gradient(135deg,#1e8449,#145a32); border-radius:12px;">
+                        <div class="card-body">
+                            <p class="mb-1">📋 Asignaciones registradas</p>
+                            <h2 class="fw-bold">{{ total_asignaciones }}</h2>
+                            <span class="stat-pill">disponibles para análisis</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SELECTOR DE PREDICCIÓN -->
+            <h6 class="text-muted mb-3">Selecciona el tipo de predicción:</h6>
+            <form method="POST" id="iaForm">
+                {% csrf_token %}
+                <input type="hidden" name="tipo" id="tipoInput" value="">
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4">
+                        <div class="card card-ia text-white p-3 btn-produccion" onclick="seleccionar('produccion', this)">
+                            <div class="card-body text-center">
+                                <div style="font-size:3rem;">📦</div>
+                                <h5 class="fw-bold mt-2">Producción</h5>
+                                <p class="small mb-0">Predice cuánto se producirá la próxima semana y detecta posibles retrasos</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card card-ia text-white p-3 btn-exportacion" onclick="seleccionar('exportaciones', this)">
+                            <div class="card-body text-center">
+                                <div style="font-size:3rem;">🚚</div>
+                                <h5 class="fw-bold mt-2">Exportaciones</h5>
+                                <p class="small mb-0">Predice si las exportaciones llegarán a tiempo y detecta riesgos de retraso</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card card-ia text-white p-3 btn-asignacion" onclick="seleccionar('asignaciones', this)">
+                            <div class="card-body text-center">
+                                <div style="font-size:3rem;">👥</div>
+                                <h5 class="fw-bold mt-2">Asignaciones</h5>
+                                <p class="small mb-0">Sugiere cuántos empleados se necesitan por turno y detecta sobrecargas</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center mb-4">
+                    <button type="submit" class="btn btn-choco px-5 py-2 fw-bold" id="btnAnalizar" disabled>
+                        <span id="btnTexto">🔍 Selecciona una opción arriba</span>
+                        <span id="btnSpinner" class="spinner-border ms-2 d-none" role="status"></span>
+                    </button>
+                </div>
+            </form>
+
+            <!-- RESULTADO -->
+            {% if error %}
+            <div class="alert alert-danger">
+                <strong>⚠️ Error:</strong> {{ error }}
+                {% if 'api_key' in error|lower or 'auth' in error|lower %}
+                <br><small>Verifica que la API key de Anthropic esté configurada correctamente en settings.py</small>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            {% if prediccion %}
+            <div class="mb-2">
+                <span class="badge fs-6 px-3 py-2"
+                    style="background-color:
+                    {% if prediccion.tipo == 'produccion' %}#e67e22
+                    {% elif prediccion.tipo == 'exportaciones' %}#2e86c1
+                    {% else %}#1e8449{% endif %}">
+                    {% if prediccion.tipo == 'produccion' %}📦 Predicción de Producción
+                    {% elif prediccion.tipo == 'exportaciones' %}🚚 Predicción de Exportaciones
+                    {% else %}👥 Predicción de Asignaciones{% endif %}
+                </span>
+            </div>
+            <div class="resultado-box">{{ prediccion.texto }}</div>
+            {% endif %}
+
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    let cardSeleccionada = null;
+
+    function seleccionar(tipo, card) {
+        if (cardSeleccionada) cardSeleccionada.classList.remove('selected');
+        card.classList.add('selected');
+        cardSeleccionada = card;
+        document.getElementById('tipoInput').value = tipo;
+        const btn = document.getElementById('btnAnalizar');
+        btn.disabled = false;
+        document.getElementById('btnTexto').textContent = '🤖 Analizar con IA';
+    }
+
+    document.getElementById('iaForm').addEventListener('submit', function() {
+        document.getElementById('btnAnalizar').disabled = true;
+        document.getElementById('btnTexto').textContent = 'Analizando...';
+        document.getElementById('btnSpinner').classList.remove('d-none');
+    });
+</script>
+</body>
+</html>
