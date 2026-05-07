@@ -42,7 +42,7 @@ ROOT_URLCONF = 'CHOCOFLOW.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],  # opcional
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -93,16 +93,16 @@ USE_TZ = True
 # 📁 Archivos estáticos
 STATIC_URL = 'static/'
 
-# 📁 Archivos estáticos adicionales (opcional)
 STATICFILES_DIRS = [
     BASE_DIR / 'static'
 ]
 
-# 📁 Archivos multimedia (opcional)
+# 📁 Archivos multimedia
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 # 🔑 Tipo de clave primaria
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
 # API Key de Anthropic para el módulo de IA
-ANTHROPIC_API_KEY = 'tu-api-key-aqui'
+ANTHROPIC_API_KEY = os.environ.get('ANTHROPIC_API_KEY', '')
