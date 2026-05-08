@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from myApp.models import Produccion, Exportacion, Usuario
+from myApp.decorators import login_requerido
 
 
 def index(request):
@@ -15,9 +16,8 @@ def index(request):
     return render(request, 'index.html', context)
 
 
+@login_requerido
 def dashboard(request):
-    if not request.session.get('usuario_id'):
-        return redirect('login')
     context = {
         'usuario_nombre': request.session.get('usuario_nombre'),
         'usuario_rol': request.session.get('usuario_rol'),
@@ -32,6 +32,14 @@ def dashboard(request):
         'exportaciones_entregadas': Exportacion.objects.filter(estado='Entregado').count(),
     }
     return render(request, 'dashboard.html', context)
+
+
+def sin_permiso(request):
+    """Vista para usuarios sin permisos suficientes."""
+    return render(request, 'sin_permiso.html', {
+        'usuario_rol': request.session.get('usuario_rol', ''),
+        'usuario_nombre': request.session.get('usuario_nombre', ''),
+    })
 
 
 from myApp.views.auth_views import login_view, logout_view

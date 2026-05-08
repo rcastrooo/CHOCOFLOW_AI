@@ -1,12 +1,11 @@
 from django.shortcuts import render, redirect
 from django.db.models import Count
 from myApp.models import Usuario, Turno, Asignacion, Produccion, Lote, Exportacion
+from myApp.decorators import solo_administrador
 
 
+@solo_administrador
 def reportes_lista(request):
-    if not request.session.get('usuario_id'):
-        return redirect('login')
-
     context = {
         'total_usuarios': Usuario.objects.count(),
         'total_turnos': Turno.objects.count(),

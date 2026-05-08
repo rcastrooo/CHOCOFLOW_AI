@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.urls import path
 from myApp.views import (
-    index, login_view, logout_view, dashboard,
+    index, login_view, logout_view, dashboard, sin_permiso,
     # Usuarios
     usuarios_lista, usuario_crear, usuario_editar, usuario_inactivar,
     # Turnos
@@ -23,6 +23,7 @@ from myApp.views import (
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', index, name='index'),
+    path('sin-permiso/', sin_permiso, name='sin_permiso'),
     path('login/', login_view, name='login'),
     path('logout/', logout_view, name='logout'),
     path('dashboard/', dashboard, name='dashboard'),

@@ -1,17 +1,16 @@
 from django.shortcuts import render, redirect
 from myApp.models import Asignacion, Usuario, Turno
+from myApp.decorators import administrador_o_supervisor, solo_administrador
 
 
+@administrador_o_supervisor
 def asignaciones_lista(request):
-    if not request.session.get('usuario_id'):
-        return redirect('login')
     asignaciones = Asignacion.objects.select_related('usuario', 'turno').all().order_by('-id')
     return render(request, 'asignaciones/lista.html', {'asignaciones': asignaciones})
 
 
+@administrador_o_supervisor
 def asignacion_crear(request):
-    if not request.session.get('usuario_id'):
-        return redirect('login')
     if request.method == 'POST':
         Asignacion.objects.create(
             usuario_id=request.POST.get('usuario_id'),
@@ -25,9 +24,8 @@ def asignacion_crear(request):
     return render(request, 'asignaciones/crear.html', {'usuarios': usuarios, 'turnos': turnos})
 
 
+@administrador_o_supervisor
 def asignacion_editar(request, id):
-    if not request.session.get('usuario_id'):
-        return redirect('login')
     asignacion = Asignacion.objects.get(id=id)
     if request.method == 'POST':
         asignacion.usuario_id = request.POST.get('usuario_id')
@@ -45,8 +43,7 @@ def asignacion_editar(request, id):
     })
 
 
+@solo_administrador
 def asignacion_eliminar(request, id):
-    if not request.session.get('usuario_id'):
-        return redirect('login')
     Asignacion.objects.get(id=id).delete()
     return redirect('asignaciones_lista')

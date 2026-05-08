@@ -1,18 +1,17 @@
 from django.shortcuts import render, redirect
 from django.utils import timezone
 from myApp.models import Exportacion
+from myApp.decorators import administrador_o_supervisor, solo_administrador
 
 
+@administrador_o_supervisor
 def exportaciones_lista(request):
-    if not request.session.get('usuario_id'):
-        return redirect('login')
     exportaciones = Exportacion.objects.all().order_by('-id')
     return render(request, 'exportaciones/lista.html', {'exportaciones': exportaciones})
 
 
+@administrador_o_supervisor
 def exportacion_crear(request):
-    if not request.session.get('usuario_id'):
-        return redirect('login')
     if request.method == 'POST':
         Exportacion.objects.create(
             destino=request.POST.get('destino'),
@@ -25,9 +24,8 @@ def exportacion_crear(request):
     return render(request, 'exportaciones/crear.html')
 
 
+@administrador_o_supervisor
 def exportacion_editar(request, id):
-    if not request.session.get('usuario_id'):
-        return redirect('login')
     exportacion = Exportacion.objects.get(id=id)
     if request.method == 'POST':
         exportacion.destino = request.POST.get('destino')
@@ -40,9 +38,8 @@ def exportacion_editar(request, id):
     return render(request, 'exportaciones/editar.html', {'exportacion': exportacion})
 
 
+@administrador_o_supervisor
 def exportacion_enviar(request, id):
-    if not request.session.get('usuario_id'):
-        return redirect('login')
     exportacion = Exportacion.objects.get(id=id)
     exportacion.estado = 'Enviado'
     exportacion.fecha_envio = timezone.now().date()
@@ -50,9 +47,8 @@ def exportacion_enviar(request, id):
     return redirect('exportaciones_lista')
 
 
+@administrador_o_supervisor
 def exportacion_entregar(request, id):
-    if not request.session.get('usuario_id'):
-        return redirect('login')
     exportacion = Exportacion.objects.get(id=id)
     exportacion.estado = 'Entregado'
     exportacion.fecha_entrega = timezone.now().date()
@@ -60,8 +56,7 @@ def exportacion_entregar(request, id):
     return redirect('exportaciones_lista')
 
 
+@solo_administrador
 def exportacion_eliminar(request, id):
-    if not request.session.get('usuario_id'):
-        return redirect('login')
     Exportacion.objects.get(id=id).delete()
     return redirect('exportaciones_lista')

@@ -1,21 +1,16 @@
 from django.shortcuts import render, redirect
 from myApp.models import Usuario
+from myApp.decorators import solo_administrador
 
+
+@solo_administrador
 def usuarios_lista(request):
-    if not request.session.get('usuario_id'):
-        return redirect('login')
-    if request.session.get('usuario_rol') != 'Administrador':
-        return redirect('dashboard')
-
     usuarios = Usuario.objects.all()
     return render(request, 'usuarios/lista.html', {'usuarios': usuarios})
 
-def usuario_crear(request):
-    if not request.session.get('usuario_id'):
-        return redirect('login')
-    if request.session.get('usuario_rol') != 'Administrador':
-        return redirect('dashboard')
 
+@solo_administrador
+def usuario_crear(request):
     if request.method == 'POST':
         Usuario.objects.create(
             nombre=request.POST.get('nombre'),
@@ -25,15 +20,11 @@ def usuario_crear(request):
             estado=request.POST.get('estado'),
         )
         return redirect('usuarios_lista')
-
     return render(request, 'usuarios/crear.html')
 
-def usuario_editar(request, id):
-    if not request.session.get('usuario_id'):
-        return redirect('login')
-    if request.session.get('usuario_rol') != 'Administrador':
-        return redirect('dashboard')
 
+@solo_administrador
+def usuario_editar(request, id):
     usuario = Usuario.objects.get(id=id)
     if request.method == 'POST':
         usuario.nombre = request.POST.get('nombre')
@@ -42,15 +33,11 @@ def usuario_editar(request, id):
         usuario.estado = request.POST.get('estado')
         usuario.save()
         return redirect('usuarios_lista')
-
     return render(request, 'usuarios/editar.html', {'usuario': usuario})
 
-def usuario_inactivar(request, id):
-    if not request.session.get('usuario_id'):
-        return redirect('login')
-    if request.session.get('usuario_rol') != 'Administrador':
-        return redirect('dashboard')
 
+@solo_administrador
+def usuario_inactivar(request, id):
     usuario = Usuario.objects.get(id=id)
     usuario.estado = 'Inactivo'
     usuario.save()

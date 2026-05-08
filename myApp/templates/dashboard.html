@@ -14,13 +14,23 @@
     <div class="sidebar">
         <h4>🍫 ChocoFlow</h4>
         <a href="{% url 'dashboard' %}">📊 Dashboard</a>
-        <a href="{% url 'usuarios_lista' %}">👥 Usuarios</a>
-        <a href="{% url 'turnos_lista' %}">🕐 Turnos</a>
-        <a href="{% url 'producciones_lista' %}">📦 Producción</a>
-        <a href="{% url 'exportaciones_lista' %}">🚚 Exportaciones</a>
-        <a href="{% url 'asignaciones_lista' %}">📋 Asignaciones</a>
-        <a href="{% url 'reportes_lista' %}">📊 Reportes</a>
-        <a href="{% url 'ia_predicciones' %}">🤖 IA</a>
+
+        {% if usuario_rol == 'Administrador' %}
+            <a href="{% url 'usuarios_lista' %}">👥 Usuarios</a>
+        {% endif %}
+
+        {% if usuario_rol == 'Administrador' or usuario_rol == 'Supervisor' %}
+            <a href="{% url 'turnos_lista' %}">🕐 Turnos</a>
+            <a href="{% url 'producciones_lista' %}">📦 Producción</a>
+            <a href="{% url 'exportaciones_lista' %}">🚚 Exportaciones</a>
+            <a href="{% url 'asignaciones_lista' %}">📋 Asignaciones</a>
+        {% endif %}
+
+        {% if usuario_rol == 'Administrador' %}
+            <a href="{% url 'reportes_lista' %}">📊 Reportes</a>
+            <a href="{% url 'ia_predicciones' %}">🤖 IA</a>
+        {% endif %}
+
         <hr style="border-color: rgba(255,255,255,0.3);">
         <a href="{% url 'logout' %}">🚪 Cerrar Sesión</a>
     </div>
