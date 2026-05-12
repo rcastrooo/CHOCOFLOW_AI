@@ -1,4 +1,3 @@
-from django.http import HttpResponse
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
@@ -6,17 +5,6 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
-
-
-
-def index(request):
-    return HttpResponse("Inicio")
-
-def login_usuario(request):
-    return HttpResponse("Login")
-
-def registro(request):
-    return HttpResponse("Registro")
 
 def registro(request):
 
@@ -153,8 +141,8 @@ def login_usuario(request):
 
 # Importación de modelos actualizados
 from .models import (
-    Usuario, Turno, EmpTurno, Asignacion,
-    Produccion, Lote, Exportacion
+    Usuario, Turno, Asignacion,
+    Produccion, Lote, Exportacion, 
 )
 
 # ========================
@@ -233,96 +221,36 @@ def turnos(request):
         })
 
 
-# ===================
-# LOGICA DE ASIGNACIONES
-# ===================
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib import messages
-from django.db.models import Q
-from .models import Asignacion, Empleado, Turno, Usuario
-
-
-@login_required(login_url='login')
+# ========================
+# ASIGNACIONES
+# ========================
+@csrf_exempt
 def asignaciones(request):
+    """
+    GET  -> Lista asignaciones
+    POST -> Asigna usuario a turno
+    """
 
-    query = request.GET.get('q')
-    estado_filtro = request.GET.get('estado')
+    if request.method == "GET":
+        data = list(Asignacion.objects.values())
+        return JsonResponse(data, safe=False)
 
-    lista = Asignacion.objects.select_related(
-        'empleado', 'turno', 'asignado_por'
-    ).all()
+    if request.method == "POST":
+        body = parse_body(request)
 
-    if query:
-        lista = lista.filter(
-            Q(tarea__icontains=query) |
-            Q(empleado__nombre__icontains=query)
+        asignacion = Asignacion.objects.create(
+            usuario_id=body.get("usuario_id"),
+            turno_id=body.get("turno_id"),
+            tarea=body.get("tarea"),
+            fecha_asignacion=body.get("fecha_asignacion")
         )
 
-    # Datos para el modal
-    empleados = Empleado.objects.filter(estado='Activo')
-    turnos    = Turno.objects.all()
-
-    return render(request, 'modulos/asignaciones/asignaciones.html', {
-        'asignaciones': lista,
-        'empleados': empleados,
-        'turnos': turnos,
-    })
+        return JsonResponse({
+            "mensaje": "Asignación creada",
+            "id": asignacion.id
+        })
 
 
-@login_required(login_url='login')
-def guardar_asignacion(request):
-
-    if request.method == 'POST':
-
-        # Obtener usuario de sesión
-        usuario_id = request.session.get('usuario_id')
-        if not usuario_id:
-            messages.error(request, "Sesión inválida. Inicia sesión nuevamente.")
-            return redirect('login')
-
-        try:
-            usuario_perfil = Usuario.objects.get(id=usuario_id)
-        except Usuario.DoesNotExist:
-            messages.error(request, "No se encontró tu perfil.")
-            return redirect('login')
-
-        asignacion_id = request.POST.get('id')
-
-        if asignacion_id:
-            asignacion = get_object_or_404(Asignacion, id=asignacion_id)
-        else:
-            asignacion = Asignacion()
-
-        # Validaciones básicas
-        tarea      = request.POST.get('tarea', '').strip()
-        fecha      = request.POST.get('fecha_asignacion', '').strip()
-        emp_id     = request.POST.get('empleado_id')
-        turno_id   = request.POST.get('turno_id')
-
-        if not tarea or not fecha or not emp_id or not turno_id:
-            messages.error(request, "Todos los campos son obligatorios.")
-            return redirect('asignaciones')
-
-        asignacion.tarea            = tarea
-        asignacion.fecha_asignacion = fecha
-        asignacion.empleado         = get_object_or_404(Empleado, id=emp_id)
-        asignacion.turno            = get_object_or_404(Turno, id=turno_id)
-        asignacion.asignado_por     = usuario_perfil
-
-        asignacion.save()
-        messages.success(request, "Asignación guardada correctamente.")
-
-    return redirect('asignaciones')
-
-
-@login_required(login_url='login')
-def eliminar_asignacion(request, id):
-
-    asignacion = get_object_or_404(Asignacion, id=id)
-    asignacion.delete()
-    messages.success(request, "Asignación eliminada.")
-    return redirect('asignaciones')
 # ========================
 # PRODUCCIÓN
 # ========================
@@ -483,6 +411,17 @@ def confirmar_entrega(request, id):
     except Exportacion.DoesNotExist:
         return JsonResponse({"error": "Exportación no encontrada"}, status=404)
 
+
+# ========================
+# REPORTES
+# ========================
+def reportes(request):
+    """
+    GET -> Lista reportes
+    """
+    data = list(Reporte.objects.values())
+    return JsonResponse(data, safe=False)
+
 # -------------------------------------
 # =======================
 # LOGICA INDEX
@@ -501,209 +440,3 @@ def index(request):
     }
 
     return render(request, 'index.html', context)
-
-# ===================
-# LOGICA DE EMPLEADOS
-# ===================
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-
-@login_required(login_url='login')
-def empleados(request):
-    query = request.GET.get('q')
-    estado = request.GET.get('estado')
-
-    lista = Empleado.objects.all()
-
-    if query:
-        lista = lista.filter(
-            Q(nombre__icontains=query) |
-            Q(email__icontains=query) |
-            Q(cedula__icontains=query)
-        )
-
-    if estado:
-        lista = lista.filter(estado=estado)
-
-    return render(request, 'modulos/empleados/empleados.html', {
-        'empleados': lista
-    })
-
-
-@login_required(login_url='login')
-def guardar_empleado(request):
-    if request.method == 'POST':
-
-        # Obtener el Usuario personalizado desde la sesión
-        usuario_id = request.session.get('usuario_id')
-        if not usuario_id:
-            messages.error(request, "Sesión inválida. Inicia sesión nuevamente.")
-            return redirect('login')
-
-        try:
-            usuario_perfil = Usuario.objects.get(id=usuario_id)
-        except Usuario.DoesNotExist:
-            messages.error(request, "No se encontró tu perfil de usuario.")
-            return redirect('login')
-
-        empleado_id = request.POST.get('id')
-
-        if empleado_id:
-            empleado = get_object_or_404(Empleado, id=empleado_id)
-        else:
-            empleado = Empleado()
-
-        empleado.cedula    = request.POST.get('cedula')
-        empleado.nombre    = request.POST.get('nombre')
-        empleado.email     = request.POST.get('email')
-        empleado.telefono  = request.POST.get('telefono')
-        empleado.direccion = request.POST.get('direccion')
-        empleado.estado    = request.POST.get('estado')
-        empleado.creado_por = usuario_perfil   # ← ya funciona correctamente
-
-        empleado.save()
-        messages.success(request, "Empleado guardado correctamente.")
-
-    return redirect('empleados')
-
-
-@login_required(login_url='login')
-def inactivar_empleado(request, id):
-    empleado = get_object_or_404(Empleado, id=id)
-    empleado.estado = 'Inactivo'
-    empleado.save()
-    messages.success(request, f"{empleado.nombre} fue inactivado.")
-    return redirect('empleados')
-# ==============================
-# LOGICA DE REPORTE DE EMPLEADOS
-# ==============================
-from django.shortcuts import render
-from .models import Empleado
-
-from django.http import HttpResponse
-
-from reportlab.pdfgen import canvas
-from reportlab.lib.pagesizes import letter
-
-from reportlab.platypus import (
-    SimpleDocTemplate,
-    Table,
-    TableStyle,
-    Paragraph,
-    Spacer
-)
-
-from reportlab.lib import colors
-from reportlab.lib.styles import getSampleStyleSheet
-
-from io import BytesIO
-
-
-def empleados(request):
-
-    empleados = Empleado.objects.all()
-
-    busqueda = request.GET.get('busqueda')
-    estado = request.GET.get('estado')
-
-    if busqueda:
-        empleados = empleados.filter(nombre__icontains=busqueda)
-
-    if estado and estado != "Todos":
-        empleados = empleados.filter(estado=estado)
-
-    context = {
-        'empleados': empleados
-    }
-
-    return render(
-        request,
-        'modulos/empleados/empleados.html',
-        context
-    )
-
-
-def generar_reporte_empleados(request):
-
-    empleados = Empleado.objects.all()
-
-    busqueda = request.GET.get('busqueda')
-    estado = request.GET.get('estado')
-
-    if busqueda:
-        empleados = empleados.filter(nombre__icontains=busqueda)
-
-    if estado and estado != "Todos":
-        empleados = empleados.filter(estado=estado)
-
-    buffer = BytesIO()
-
-    doc = SimpleDocTemplate(
-        buffer,
-        pagesize=letter
-    )
-
-    elementos = []
-
-    estilos = getSampleStyleSheet()
-
-    titulo = Paragraph(
-        "Reporte de Empleados - ChocoFlow",
-        estilos['Title']
-    )
-
-    elementos.append(titulo)
-    elementos.append(Spacer(1, 20))
-
-    datos = [
-        [
-            'Cédula',
-            'Nombre',
-            'Email',
-            'Estado'
-        ]
-    ]
-
-    for emp in empleados:
-
-        datos.append([
-            emp.cedula,
-            emp.nombre,
-            emp.email,
-            emp.estado
-        ])
-
-    tabla = Table(datos)
-
-    tabla.setStyle(TableStyle([
-
-        ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#603C1C')),
-        ('TEXTCOLOR',(0,0),(-1,0),colors.white),
-
-        ('GRID', (0,0), (-1,-1), 1, colors.black),
-
-        ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
-
-        ('BACKGROUND', (0,1), (-1,-1), colors.beige),
-
-    ]))
-
-    elementos.append(tabla)
-
-    doc.build(elementos)
-
-    pdf = buffer.getvalue()
-
-    buffer.close()
-
-    response = HttpResponse(
-        content_type='application/pdf'
-    )
-
-    response['Content-Disposition'] = (
-        'attachment; filename="reporte_empleados.pdf"'
-    )
-
-    response.write(pdf)
-
-    return response

@@ -95,11 +95,10 @@ USE_I18N = True
 USE_TZ = True
 
 # Archivos estáticos — corregido
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
-    BASE_DIR / "static",        # carpeta raíz ← agregar esto
-    BASE_DIR / "myApp" / "static",
+    BASE_DIR / 'static',
 ]
 
 # Archivos multimedia
