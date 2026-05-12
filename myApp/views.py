@@ -142,7 +142,7 @@ def login_usuario(request):
 # Importación de modelos actualizados
 from .models import (
     Usuario, Turno, Asignacion,
-    Produccion, Lote, Exportacion, Reporte
+    Produccion, Lote, Exportacion, 
 )
 
 # ========================
