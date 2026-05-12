@@ -1,0 +1,147 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Segoe UI', sans-serif; background-color: #fff; }
+
+/* NAVBAR */
+.navbar {
+    background-color: #3b1f0a;
+    padding: 15px 40px;
+}
+.navbar-brand {
+    color: #fff !important;
+    font-size: 1.5rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+.navbar-brand span { color: #e8a045; }
+.nav-btn {
+    background-color: #e8a045;
+    color: #3b1f0a !important;
+    border-radius: 20px;
+    padding: 8px 22px;
+    font-weight: bold;
+    text-decoration: none;
+    margin-left: 10px;
+    transition: 0.3s;
+}
+.nav-btn:hover { background-color: #c47f20; color: white !important; }
+.nav-link-custom {
+    color: rgba(255,255,255,0.8) !important;
+    text-decoration: none;
+    margin-left: 20px;
+    font-size: 15px;
+    transition: 0.3s;
+}
+.nav-link-custom:hover { color: #e8a045 !important; }
+
+/* HERO */
+.hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    overflow: hidden;
+    background: url('https://thumbs.dreamstime.com/b/empleados-de-la-f%C3%A1brica-del-chocolate-19138742.jpg') center/cover no-repeat;
+}
+.hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.65);
+    z-index: 0;
+}
+.hero-content {
+    position: relative;
+    z-index: 1;
+    color: white;
+    max-width: 750px;
+    padding: 20px;
+}
+.hero-content h1 {
+    font-size: 2.8rem;
+    font-weight: 800;
+    line-height: 1.2;
+    margin-bottom: 20px;
+}
+.hero-content h1 span { color: #e8a045; }
+.hero-content p {
+    font-size: 1.15rem;
+    color: rgba(255,255,255,0.85);
+    margin-bottom: 35px;
+}
+.btn-hero {
+    background-color: #e8a045;
+    color: #3b1f0a;
+    padding: 14px 40px;
+    border-radius: 30px;
+    font-weight: bold;
+    font-size: 1rem;
+    text-decoration: none;
+    border: none;
+    transition: 0.3s;
+    margin: 5px;
+    display: inline-block;
+}
+.btn-hero:hover { background-color: #c47f20; color: white; }
+.btn-hero-outline {
+    background-color: transparent;
+    color: white;
+    border: 2px solid white;
+    padding: 14px 40px;
+    border-radius: 30px;
+    font-weight: bold;
+    font-size: 1rem;
+    text-decoration: none;
+    transition: 0.3s;
+    margin: 5px;
+    display: inline-block;
+}
+.btn-hero-outline:hover { background-color: white; color: #3b1f0a; }
+
+/* CARACTERÍSTICAS */
+.features { padding: 80px 20px; background-color: #fdf6ee; }
+.features h2 { text-align: center; color: #3b1f0a; font-weight: 800; margin-bottom: 10px; font-size: 2rem; }
+.features p.sub { text-align: center; color: #888; margin-bottom: 50px; font-size: 1rem; }
+.feature-card {
+    background: white;
+    border-radius: 16px;
+    padding: 35px 25px;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+    transition: 0.3s;
+    height: 100%;
+}
+.feature-card:hover { transform: translateY(-5px); box-shadow: 0 8px 30px rgba(0,0,0,0.12); }
+.feature-icon { font-size: 2.5rem; margin-bottom: 15px; }
+.feature-card h5 { color: #3b1f0a; font-weight: 700; margin-bottom: 10px; }
+.feature-card p { color: #777; font-size: 0.95rem; }
+
+/* ESTADÍSTICAS */
+.stats { background-color: #3b1f0a; padding: 60px 20px; }
+.stat-item { text-align: center; color: white; }
+.stat-item h3 { font-size: 2.5rem; font-weight: 800; color: #e8a045; }
+.stat-item p { font-size: 1rem; color: rgba(255,255,255,0.8); }
+
+/* CARDS RECIENTES */
+.recent { padding: 80px 20px; background-color: #fff; }
+.recent h2 { text-align: center; color: #3b1f0a; font-weight: 800; margin-bottom: 10px; font-size: 2rem; }
+.recent p.sub { text-align: center; color: #888; margin-bottom: 50px; }
+.card-custom {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    transition: 0.3s;
+}
+.card-custom:hover { transform: translateY(-3px); }
+.section-title { color: #3b1f0a; font-weight: bold; }
+
+/* FOOTER */
+footer {
+    background-color: #1a0d05;
+    color: rgba(255,255,255,0.7);
+    text-align: center;
+    padding: 30px 20px;
+    font-size: 0.9rem;
+}
+footer span { color: #e8a045; font-weight: bold; }
